@@ -1162,7 +1162,80 @@ const DEFAULT_DB = {
     pergola_tipusok:[
       {nev:'Alumínium (forgó lamellas)',sub:''},{nev:'Alumínium (fix)',sub:''},{nev:'Fa pergola',sub:''},
     ],
-    ajto_lap_tipusok:[
+    nyitasi_modok:[
+      {nev:'Fix (nem nyitható)',sub:''},{nev:'Bukó-nyíló (BNY)',sub:''},
+      {nev:'Nyíló (NY)',sub:''},{nev:'Bukó (BU)',sub:''},
+      {nev:'Toló',sub:''},{nev:'Billenő',sub:''},
+      {nev:'Csúszó-toló (PSK)',sub:''},{nev:'Harmonika',sub:''},
+    ],
+    nyilasiranyok:[
+      {nev:'Bal',sub:''},{nev:'Jobb',sub:''},
+      {nev:'Közép',sub:''},{nev:'Nincs (fix/toló)',sub:''},
+    ],
+    tokbeepitesi_modok:[
+      {nev:'Vakolat alá',sub:''},{nev:'Vakolatra',sub:''},
+      {nev:'Renovációs tok',sub:''},{nev:'Egyéb',sub:''},
+    ],
+    takaroles_tipusok:[
+      {nev:'Csak kívül',sub:''},{nev:'Csak belül',sub:''},{nev:'Kívül és belül',sub:''},
+    ],
+    redony_vezerlések:[
+      {nev:'Kézi (szalagos)',sub:''},{nev:'Kézi (kurblis)',sub:''},
+      {nev:'Motoros (230V)',sub:''},{nev:'Motoros (Smart)',sub:''},{nev:'Solar motoros',sub:''},
+    ],
+    redony_elhelyezések:[
+      {nev:'Méreten belül (MB)',sub:''},{nev:'Méreten kívül (MK)',sub:''},
+    ],
+    szunyoghalo_rogzitesek:[
+      {nev:'Fix (keret)',sub:''},{nev:'Nyíló (szárnyba)',sub:''},
+      {nev:'Felcsévélős',sub:''},{nev:'Plisszé',sub:''},
+    ],
+    rolo_vezerlések:[
+      {nev:'Láncos kézi',sub:''},{nev:'Motoros (230V)',sub:''},
+      {nev:'Motoros (Smart)',sub:''},{nev:'Spring (rugós)',sub:''},
+    ],
+    rolo_rogzitesek:[
+      {nev:'Mennyezeti',sub:''},{nev:'Fali',sub:''},
+      {nev:'Tok felső',sub:''},{nev:'Ablakszárny',sub:''},
+    ],
+    zsaluzia_lamellak:[
+      {nev:'16 mm (micro)',sub:''},{nev:'25 mm',sub:''},
+      {nev:'50 mm',sub:''},{nev:'89 mm (vertikális)',sub:''},
+    ],
+    zsaluzia_vezerlések:[
+      {nev:'Kézi (zsinóros)',sub:''},{nev:'Motoros',sub:''},
+    ],
+    garazs_nyitasok:[
+      {nev:'Szekcionált (felfutó)',sub:''},{nev:'Billenő',sub:''},
+      {nev:'Toló',sub:''},{nev:'Forgó (kétrészes)',sub:''},
+    ],
+    garazs_meghajtasok:[
+      {nev:'Kézi',sub:''},{nev:'Motoros (230V)',sub:''},{nev:'Motoros (Smart)',sub:''},
+    ],
+    garazs_szigetelések:[
+      {nev:'Nincs (egyrétegű)',sub:''},{nev:'20mm PU hab',sub:''},
+      {nev:'40mm PU hab',sub:''},{nev:'67mm PU hab',sub:''},
+    ],
+    pergola_iranyok:[
+      {nev:'Forgó lamella',sub:''},{nev:'Fix lamella',sub:''},{nev:'Nyitható tető',sub:''},
+    ],
+    pergola_vezerlések:[
+      {nev:'Kézi',sub:''},{nev:'Motoros (távirányító)',sub:''},{nev:'Motoros (Smart)',sub:''},
+    ],
+    pergola_oldalfalak:[
+      {nev:'Nincs',sub:''},{nev:'Üveg oldalfal',sub:''},
+      {nev:'Screen oldalfal',sub:''},{nev:'Vászon oldalfal',sub:''},
+    ],
+    ajto_tok_tipusok:[
+      {nev:'Normál tok',sub:''},{nev:'Blokk tok',sub:''},
+      {nev:'Tégla tok',sub:''},{nev:'Pakoló tok',sub:''},
+    ],
+    ajto_kilincsek:[
+      {nev:'Igen – kilincs+zár',sub:''},{nev:'Igen – kilincs, zár nélkül',sub:''},{nev:'Nem',sub:''},
+    ],
+    pf_elhelyezések:[
+      {nev:'Méreten belül (MB)',sub:''},{nev:'Méreten kívül (MK)',sub:''},
+    ],
       {nev:'Sima tömör',sub:''},{nev:'Üvegbetétes (1/3)',sub:''},
       {nev:'Üvegbetétes (1/2)',sub:''},{nev:'Kazettás',sub:''},
     ],
@@ -1468,18 +1541,47 @@ function populateSelects(){
   const o=db.options;
   fillSelect('f-profil',o.profilok); fillSelect('f-uveg',o.uvegek);
   fillSelect('f-uveg-osztaly',o.uveg_osztalyok);
+  fillSelect('f-nyitas',o.nyitasi_modok);
+  fillSelect('f-irany',o.nyilasiranyok);
+  fillSelect('f-tokbeep',o.tokbeepitesi_modok);
+  fillSelect('f-takaroles',[{nev:'Nincs',sub:''},...(o.takaroles_tipusok||[])]);
   fillSelect('f-szin',o.szinek);
+  fillSelect('f-pf-elhelyezes',o.pf_elhelyezések);
   fillSelect('f-redony-tipus',o.redony_tipusok); fillSelect('f-redony-lamella',o.redony_lamellak);
+  fillSelect('f-redony-vez',o.redony_vezerlések);
+  fillSelect('f-redony-elhelyezes',o.redony_elhelyezések);
   fillSelect('f-szunyog-tipus',o.szunyoghalo_tipusok);
-  fillSelect('f-ajto-lap',o.ajto_lap_tipusok); fillSelect('f-ajto-szin',o.ajto_szinek);
+  fillSelect('f-ajto-lap',o.ajto_lap_tipusok);
+  fillSelect('f-ajto-tok',o.ajto_tok_tipusok);
+  fillSelect('f-ajto-kilincs',o.ajto_kilincsek);
+  fillSelect('f-ajto-szin',o.ajto_szinek);
   fillSelect('f-onallo-redony-tipus',o.redony_tipusok); fillSelect('f-onallo-lamella',o.redony_lamellak);
+  fillSelect('f-onallo-vez',o.redony_vezerlések);
   fillSelect('f-onallo-szin',o.szinek);
+  fillSelect('f-onallo-elhelyezes',o.redony_elhelyezések);
+  fillSelect('f-onallo-beep',[{nev:'Tokba épített'},{nev:'Tokra szerelékes'},{nev:'Falpárkányos'},{nev:'Mennyezeti'}]);
   fillSelect('f-rolo-tipus',o.rolo_tipusok); fillSelect('f-rolo-anyag',o.rolo_anyagok);
-  fillSelect('f-zsal-tipus',o.zsaluzia_tipusok); fillSelect('f-zsal-szin',o.szinek);
-  fillSelect('f-garazs-tipus',o.garazs_tipusok); fillSelect('f-garazs-szin',o.szinek);
-  fillSelect('f-pergola-tipus',o.pergola_tipusok); fillSelect('f-pergola-szin',o.szinek);
-  fillSelect('f-szunyog-onallo',o.szunyoghalo_tipusok); fillSelect('f-szunyog-szin',o.szinek);
+  fillSelect('f-rolo-vez',o.rolo_vezerlések);
+  fillSelect('f-rolo-rogzites',o.rolo_rogzitesek);
+  fillSelect('f-zsal-tipus',o.zsaluzia_tipusok);
+  fillSelect('f-zsal-lamella',o.zsaluzia_lamellak);
+  fillSelect('f-zsal-szin',o.szinek);
+  fillSelect('f-zsal-vez',o.zsaluzia_vezerlések);
+  fillSelect('f-garazs-tipus',o.garazs_tipusok);
+  fillSelect('f-garazs-nyitas',o.garazs_nyitasok);
+  fillSelect('f-garazs-meghajtás',o.garazs_meghajtasok);
+  fillSelect('f-garazs-szin',o.szinek);
+  fillSelect('f-garazs-szigetelés',o.garazs_szigetelések);
+  fillSelect('f-pergola-tipus',o.pergola_tipusok);
+  fillSelect('f-pergola-irany',o.pergola_iranyok);
+  fillSelect('f-pergola-vez',o.pergola_vezerlések);
+  fillSelect('f-pergola-szin',o.szinek);
+  fillSelect('f-pergola-oldalfal',o.pergola_oldalfalak);
+  fillSelect('f-szunyog-onallo',o.szunyoghalo_tipusok);
+  fillSelect('f-szunyog-rogzites',o.szunyoghalo_rogzitesek);
+  fillSelect('f-szunyog-szin',o.szinek);
   fillSelect('sze-profil',o.profilok); fillSelect('sze-uveg',o.uvegek); fillSelect('sze-szin',o.szinek);
+  fillSelect('sze-nyitas',o.nyitasi_modok); fillSelect('sze-irany',o.nyilasiranyok);
 }
 
 function fillSelect(id,items){
@@ -2200,8 +2302,9 @@ function generatePDF(){
 function toggleAdminSection(head){
   const body=head.nextElementSibling;
   const arrow=head.querySelector('span');
-  body.style.display=body.style.display==='none'?'block':'none';
-  arrow.textContent=body.style.display==='none'?'▶':'▼';
+  const isHidden = body.style.display==='' || body.style.display==='none';
+  body.style.display=isHidden?'block':'none';
+  arrow.textContent=isHidden?'▼':'▶';
 }
 
 function loadAdminPanel(){
@@ -2332,17 +2435,37 @@ const OPTION_SECTIONS=[
   {key:'profilok',label:'🪟 Tokprofilok',sub:true},
   {key:'uvegek',label:'🔷 Üvegtípusok',sub:true},
   {key:'uveg_osztalyok',label:'🛡️ Üvegezési osztályok',sub:true},
+  {key:'nyitasi_modok',label:'🔄 Nyitási módok',sub:false},
+  {key:'nyilasiranyok',label:'↔️ Nyílásirányok',sub:false},
+  {key:'tokbeepitesi_modok',label:'🧱 Tokbeépítési módok',sub:false},
+  {key:'takaroles_tipusok',label:'📐 Takaróléc típusok',sub:false},
   {key:'redony_tipusok',label:'🔲 Redőny típusok',sub:true},
   {key:'redony_lamellak',label:'▬ Redőny lamellák',sub:true},
-  {key:'szinek',label:'🎨 Színek',sub:false},
+  {key:'redony_vezerlések',label:'⚙️ Redőny vezérlések',sub:false},
+  {key:'redony_elhelyezések',label:'📏 Redőny elhelyezések',sub:false},
+  {key:'szinek',label:'🎨 Színek (ablak/ajtó)',sub:false},
   {key:'szunyoghalo_tipusok',label:'🕸️ Szúnyogháló típusok',sub:true},
+  {key:'szunyoghalo_rogzitesek',label:'🔩 Szúnyogháló rögzítési módok',sub:false},
   {key:'rolo_tipusok',label:'🟫 Roló típusok',sub:true},
   {key:'rolo_anyagok',label:'🧵 Roló anyagok',sub:true},
+  {key:'rolo_vezerlések',label:'⚙️ Roló vezérlések',sub:false},
+  {key:'rolo_rogzitesek',label:'🔩 Roló rögzítések',sub:false},
   {key:'zsaluzia_tipusok',label:'🔳 Zsalúzia típusok',sub:true},
+  {key:'zsaluzia_lamellak',label:'▬ Zsalúzia lamella szélességek',sub:false},
+  {key:'zsaluzia_vezerlések',label:'⚙️ Zsalúzia vezérlések',sub:false},
   {key:'garazs_tipusok',label:'🏠 Garázskapu típusok',sub:true},
+  {key:'garazs_nyitasok',label:'🔄 Garázskapu nyitási módok',sub:false},
+  {key:'garazs_meghajtasok',label:'⚙️ Garázskapu meghajtások',sub:false},
+  {key:'garazs_szigetelések',label:'🌡️ Garázskapu hőszigetelések',sub:false},
   {key:'pergola_tipusok',label:'⛱️ Pergola típusok',sub:true},
+  {key:'pergola_iranyok',label:'🔄 Pergola lamella irányok',sub:false},
+  {key:'pergola_vezerlések',label:'⚙️ Pergola vezérlések',sub:false},
+  {key:'pergola_oldalfalak',label:'🧱 Pergola oldalfal típusok',sub:false},
   {key:'ajto_lap_tipusok',label:'🚪 Belső ajtólap típusok',sub:true},
+  {key:'ajto_tok_tipusok',label:'🔲 Belső ajtó tok típusok',sub:false},
+  {key:'ajto_kilincsek',label:'🔑 Kilincs típusok',sub:false},
   {key:'ajto_szinek',label:'🎨 Belső ajtó színek',sub:false},
+  {key:'pf_elhelyezések',label:'📐 PF profil elhelyezések',sub:false},
 ];
 
 function renderOptionSections(){
