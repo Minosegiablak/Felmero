@@ -2500,7 +2500,7 @@ function renderOptionList(key){
           <div class="option-item-name">${item.nev}</div>
           ${item.sub?`<div class="option-item-sub">${item.sub}</div>`:''}
         </div>
-        <button class="btn btn-icon" onclick="deleteOption('${key}',${i})">🗑</button>
+        <button class="btn btn-icon" type="button" onclick="deleteOptionByName('${key}','${item.nev.replace(/'/g,"\\'")}')">🗑</button>
       </li>
     `).join('');
 }
@@ -2518,8 +2518,23 @@ function addOption(key,hasSub){
 }
 
 function deleteOption(key,i){
-  if(!confirm('Törlöd?')) return;
-  db.options[key].splice(i,1); saveDB(); renderOptionList(key); populateSelects(); toast('🗑 Törölve');
+  if(!confirm('Törlöd ezt az opciót?')) return;
+  if(!db.options[key]) return;
+  db.options[key].splice(i,1);
+  saveDB();
+  renderOptionList(key);
+  populateSelects();
+  toast('🗑 Törölve');
+}
+
+function deleteOptionByName(key,nev){
+  if(!confirm('Törlöd: '+nev+'?')) return;
+  if(!db.options[key]) return;
+  db.options[key]=db.options[key].filter(x=>x.nev!==nev);
+  saveDB();
+  renderOptionList(key);
+  populateSelects();
+  toast('🗑 Törölve');
 }
 
 // Export / Import
