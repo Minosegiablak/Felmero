@@ -200,6 +200,19 @@ textarea{resize:vertical;min-height:70px;}
 .helyszin-select{width:100%;background:var(--dark2);border:1px solid var(--gray2);color:#fff;padding:10px 12px;font-size:14px;border-radius:0;-webkit-appearance:none;outline:none;}
 .helyszin-select:focus{border-color:var(--red);}
 
+/* TOKTOLDÓZÁS */
+.tp-section{background:var(--dark3);border:1px solid #2a3a2a;border-left:3px solid #44aa44;padding:14px;margin-top:10px;}
+.tp-section-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#44aa44;text-transform:uppercase;margin-bottom:10px;}
+.tp-sablon-display{background:var(--dark2);border:1px solid var(--gray2);padding:8px 12px;font-family:'Share Tech Mono',monospace;font-size:14px;color:#44cc44;letter-spacing:2px;margin-top:6px;}
+.tp-oldal-row{display:grid;grid-template-columns:60px 1fr;align-items:center;gap:8px;margin-bottom:8px;}
+.tp-oldal-label{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--silver);text-transform:uppercase;letter-spacing:1px;}
+.tp-mm-tags{display:flex;flex-wrap:wrap;gap:4px;min-height:36px;background:var(--dark2);border:1px solid var(--gray2);padding:4px 8px;cursor:pointer;}
+.tp-mm-tag{background:var(--red-dim);border:1px solid var(--red);color:var(--red3);padding:3px 8px;font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.tp-mm-tag:hover{background:var(--red);color:#fff;}
+.tp-mm-tag .tp-remove{font-size:10px;font-weight:700;}
+.tp-add-btn{background:var(--dark3);border:1px solid var(--gray2);color:var(--silver);padding:3px 8px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;}
+.tp-add-btn:hover{border-color:var(--red);color:var(--red3);}
+
 /* PRINT */
 #print-area{display:none;}
 @media print{
@@ -584,9 +597,52 @@ textarea{resize:vertical;min-height:70px;}
               </div>
             </div>
 
-            <!-- Osztó -->
+            <!-- Toktoldózás (TP) -->
             <div class="toggle-row">
-              <span class="toggle-label">Van osztó?</span>
+              <span class="toggle-label">Toktoldózás (TP) szükséges?</span>
+              <label class="toggle">
+                <input type="checkbox" id="t-tp" onchange="toggleCond('tp-sec',this.checked); onTpToggle()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div id="tp-sec" class="cond-field">
+              <div class="tp-section">
+                <div class="tp-section-title">⬛ Toktoldózás (TP)</div>
+                <div class="grid-2" style="margin-bottom:10px;">
+                  <div class="form-group" style="margin:0;">
+                    <label>TP típus</label>
+                    <select id="f-tp-tipus" onchange="onTpTipusChange()">
+                      <option value="">— Válasszon —</option>
+                      <option value="kt">KT Redőny előkészítés</option>
+                      <option value="vako">VAKO Redőny előkészítés</option>
+                      <option value="egyedi">Egyedi</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label>Elhelyezés</label>
+                    <select id="f-tp-elhelyezes">
+                      <option value="">— Válasszon —</option>
+                      <option value="MB">Méreten belül (MB)</option>
+                      <option value="MK">Méreten kívül (MK)</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- KT/VAKO sablon megjelenítés -->
+                <div id="tp-sablon-display" style="display:none;">
+                  <label style="font-size:11px;color:var(--silver);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;display:block;">Sablon értékei</label>
+                  <div class="tp-sablon-display" id="tp-sablon-ertek">—</div>
+                  <div style="font-size:10px;color:var(--gray3);margin-top:4px;font-family:'Share Tech Mono',monospace;">Bal / Fent / Jobb / Alul</div>
+                </div>
+                <!-- Egyedi TP -->
+                <div id="tp-egyedi-sec" style="display:none;">
+                  <div style="margin-bottom:6px;font-size:11px;color:var(--silver);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Oldalankénti TP (mm)</div>
+                  <div class="tp-oldal-row"><span class="tp-oldal-label">Bal</span><div class="tp-mm-tags" id="tp-bal-tags" onclick="openTpPicker('bal')"><span style="font-size:11px;color:var(--gray3);">+ kattints</span></div></div>
+                  <div class="tp-oldal-row"><span class="tp-oldal-label">Fent</span><div class="tp-mm-tags" id="tp-fent-tags" onclick="openTpPicker('fent')"><span style="font-size:11px;color:var(--gray3);">+ kattints</span></div></div>
+                  <div class="tp-oldal-row"><span class="tp-oldal-label">Jobb</span><div class="tp-mm-tags" id="tp-jobb-tags" onclick="openTpPicker('jobb')"><span style="font-size:11px;color:var(--gray3);">+ kattints</span></div></div>
+                  <div class="tp-oldal-row"><span class="tp-oldal-label">Alul</span><div class="tp-mm-tags" id="tp-alul-tags" onclick="openTpPicker('alul')"><span style="font-size:11px;color:var(--gray3);">+ kattints</span></div></div>
+                </div>
+              </div>
+            </div>
               <label class="toggle">
                 <input type="checkbox" id="t-oszto" onchange="toggleCond('oszto-sec',this.checked)">
                 <span class="toggle-slider"></span>
@@ -998,6 +1054,55 @@ textarea{resize:vertical;min-height:70px;}
         </div>
       </div>
 
+      <!-- Toktoldózás (TP) Admin -->
+      <div class="admin-section">
+        <div class="admin-section-head" onclick="toggleAdminSection(this)">
+          <h3>⬛ Toktoldózás (TP) beállítások</h3><span>▼</span>
+        </div>
+        <div class="admin-section-body">
+          <!-- TP mm értékek -->
+          <div style="margin-bottom:18px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--red3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">TP méret lista (mm értékek)</div>
+            <div class="info-box">Ezek lesznek választhatók egyedi TP esetén oldalanként.</div>
+            <ul class="option-list" id="tp-mm-list"></ul>
+            <div class="sep"></div>
+            <div style="display:flex;gap:10px;align-items:flex-end;">
+              <div class="form-group" style="margin:0;flex:1;"><label>Új mm érték</label><input type="number" id="tp-mm-new" placeholder="pl. 36" min="1" max="999"></div>
+              <button class="btn btn-primary btn-small" onclick="addTpMm()" style="height:44px;">+ Hozzáadás</button>
+            </div>
+          </div>
+          <div class="sep"></div>
+          <!-- KT sablon -->
+          <div style="margin-bottom:18px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--red3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">KT Redőny előkészítés sablon</div>
+            <div class="info-box">Minden oldalnál több érték is megadható <strong>+</strong> jellel (pl. 36+50)</div>
+            <div class="grid-2">
+              <div class="form-group"><label>Bal</label><input type="text" id="tp-kt-bal" placeholder="pl. 36" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Fent</label><input type="text" id="tp-kt-fent" placeholder="pl. 58+36" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Jobb</label><input type="text" id="tp-kt-jobb" placeholder="pl. 36" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Alul</label><input type="text" id="tp-kt-alul" placeholder="pl. 0" oninput="saveTpSablonok()"></div>
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#44cc44;background:var(--dark2);padding:8px 12px;border:1px solid var(--gray2);">
+              Sablon: <span id="tp-kt-preview">—</span>
+            </div>
+          </div>
+          <div class="sep"></div>
+          <!-- VAKO sablon -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--red3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">VAKO Redőny előkészítés sablon</div>
+            <div class="grid-2">
+              <div class="form-group"><label>Bal</label><input type="text" id="tp-vako-bal" placeholder="pl. 36" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Fent</label><input type="text" id="tp-vako-fent" placeholder="pl. 0" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Jobb</label><input type="text" id="tp-vako-jobb" placeholder="pl. 36" oninput="saveTpSablonok()"></div>
+              <div class="form-group"><label>Alul</label><input type="text" id="tp-vako-alul" placeholder="pl. 0" oninput="saveTpSablonok()"></div>
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#44cc44;background:var(--dark2);padding:8px 12px;border:1px solid var(--gray2);">
+              Sablon: <span id="tp-vako-preview">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Felmérési szám -->
       <div class="admin-section">
         <div class="admin-section-head" onclick="toggleAdminSection(this)">
@@ -1104,6 +1209,11 @@ const DEFAULT_DB = {
   alapkeszlet: {
     profil:'', uveg:'', szin:'', nyitas:'', irany:'', tokbeep:'',
     redony: false, redonyTipus:'', redonyLamella:''
+  },
+  tp: {
+    mm_ertekek: [36, 50, 58, 70, 100],
+    kt: { bal:'36', fent:'58+36', jobb:'36', alul:'0' },
+    vako: { bal:'36', fent:'0', jobb:'36', alul:'0' },
   },
   counter: 1,
   helyszin_kerdesek: [
@@ -1258,6 +1368,10 @@ let currentFotoBase64 = null;
 let editingIndex = null;
 let currentSzerkezetElemek = [];
 let autoSaveTimer = null;
+
+// TP state
+let tpEgyediData = { bal:[], fent:[], jobb:[], alul:[] };
+let tpPickerOldal = null;
 
 function saveDB(){ localStorage.setItem('nf_db', JSON.stringify(db)); }
 function saveItems(){ localStorage.setItem('nf_items', JSON.stringify(items)); }
@@ -1506,6 +1620,7 @@ function clearItemForm(){
   document.getElementById('oszto-sec').classList.remove('visible');
   document.getElementById('t-pf').checked=false;
   document.getElementById('pf-sec').classList.remove('visible');
+  clearTpForm();
   document.querySelectorAll('#item-form select').forEach(s=>s.selectedIndex=0);
   currentFotoBase64=null;
   document.getElementById('f-foto').value='';
@@ -1647,6 +1762,8 @@ function saveItem(){
     }
     item.oszto=document.getElementById('t-oszto').checked;
     if(item.oszto) item.osztoLeiras=document.getElementById('f-oszto').value;
+    // Toktoldózás
+    item.tp=getTpItemData();
   }
   if(currentType==='belsoajto'){
     item.ajtoLap=document.getElementById('f-ajto-lap').value;
@@ -1790,6 +1907,7 @@ function renderItems(){
             ${item.profil?' · '+item.profil:''}
             ${item.redonyPrep?' · 🔲 Red.':''}
             ${item.pf?' · PF':''}
+            ${item.tp?' · TP':''}
             ${item.szunyog?' · 🕸️':''}
             ${item.oszto?' · osztó':''}
             ${item.foto?' · 📸':''}
@@ -1842,6 +1960,7 @@ function openEditModal(i){
     'Nyitási mód':item.nyitas,'Nyílásirány':item.irany,'Szín':item.szin,
     'Tokbeépítés':item.tokbeep,'Takaróléc':item.takaroles,
     'PF profil':item.pf?`Igen – ${item.pfElhelyezes||''}`:undefined,
+    'Toktoldózás (TP)':item.tp?`${item.tp.tipus==='kt'?'KT Red. előkész.':item.tp.tipus==='vako'?'VAKO Red. előkész.':'Egyedi'} [${item.tp.elhelyezes||''}] ${item.tp.display||''}`:undefined,
     'Redőny előkészítés':item.redonyPrep?'IGEN':undefined,
     'Redőny típus':item.redonyTipus,'Redőny vezérlés':item.redonyVez,
     'Redőny lamella':item.redonyLamella,'Redőny elhelyezés':item.redonyElhelyezes,
@@ -2038,6 +2157,11 @@ function getItemFields(item){
     if(item.szunyogSz&&item.szunyogM) f.push(['Szúnyogháló méret',`${item.szunyogSz}×${item.szunyogM}mm`]);
   }
   if(item.oszto&&item.osztoLeiras) f.push(['Osztó',item.osztoLeiras]);
+  if(item.tp){
+    const tpLabel=item.tp.tipus==='kt'?'KT Red. előkész.':item.tp.tipus==='vako'?'VAKO Red. előkész.':'Egyedi TP';
+    f.push(['Toktoldózás (TP)',`${tpLabel}${item.tp.elhelyezes?' ['+item.tp.elhelyezes+']':''}`]);
+    if(item.tp.display) f.push(['TP értékek (B/F/J/A)',item.tp.display]);
+  }
   if(item.ajtoLap) f.push(['Ajtólap',item.ajtoLap]);
   if(item.ajtoTok) f.push(['Ajtó tok',item.ajtoTok]);
   if(item.ajtoIrany) f.push(['Nyílásirány',item.ajtoIrany]);
@@ -2327,6 +2451,7 @@ function loadAdminPanel(){
   renderUsers();
   renderHelyszinKerdesekAdmin();
   loadAlapkeszletAdmin();
+  loadTpAdmin();
   renderOptionSections();
 }
 
@@ -2573,9 +2698,197 @@ function importJSON(input){
 }
 
 // ═══════════════════════════════════════════
+//  TOKTOLDÓZÁS (TP)
+// ═══════════════════════════════════════════
+function onTpToggle(){
+  tpEgyediData={bal:[],fent:[],jobb:[],alul:[]};
+  document.getElementById('f-tp-tipus').value='';
+  document.getElementById('tp-sablon-display').style.display='none';
+  document.getElementById('tp-egyedi-sec').style.display='none';
+  renderTpEgyediTags();
+}
+
+function onTpTipusChange(){
+  const val=document.getElementById('f-tp-tipus').value;
+  const sablonDiv=document.getElementById('tp-sablon-display');
+  const egyediDiv=document.getElementById('tp-egyedi-sec');
+  if(val==='kt'||val==='vako'){
+    sablonDiv.style.display='block';
+    egyediDiv.style.display='none';
+    const s=(val==='kt'?db.tp?.kt:db.tp?.vako)||{};
+    const str=formatTpSablon(s);
+    document.getElementById('tp-sablon-ertek').textContent=str||'—';
+  } else if(val==='egyedi'){
+    sablonDiv.style.display='none';
+    egyediDiv.style.display='block';
+    tpEgyediData={bal:[],fent:[],jobb:[],alul:[]};
+    renderTpEgyediTags();
+  } else {
+    sablonDiv.style.display='none';
+    egyediDiv.style.display='none';
+  }
+}
+
+function formatTpSablon(s){
+  const b=s.bal||'0'; const f=s.fent||'0'; const j=s.jobb||'0'; const a=s.alul||'0';
+  return `${b} / ${f} / ${j} / ${a}`;
+}
+
+function openTpPicker(oldal){
+  tpPickerOldal=oldal;
+  const mmList=(db.tp?.mm_ertekek||[]).sort((a,b)=>a-b);
+  if(mmList.length===0){toast('Admin panelen adj hozzá TP mm értékeket!');return;}
+  // Build picker popup
+  const existing=tpEgyediData[oldal]||[];
+  const tagsEl=document.getElementById('tp-'+oldal+'-tags');
+  // Show inline dropdown
+  const oldPicker=document.getElementById('tp-picker-popup');
+  if(oldPicker) oldPicker.remove();
+  const picker=document.createElement('div');
+  picker.id='tp-picker-popup';
+  picker.style.cssText='position:fixed;z-index:500;background:var(--dark2);border:1px solid var(--red);padding:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:280px;box-shadow:0 4px 20px rgba(0,0,0,.8);';
+  mmList.forEach(mm=>{
+    const btn=document.createElement('button');
+    btn.textContent=mm+'mm';
+    btn.style.cssText='background:var(--dark3);border:1px solid var(--gray2);color:var(--light);padding:6px 12px;cursor:pointer;font-family:"Share Tech Mono",monospace;font-size:13px;';
+    btn.onclick=(e)=>{e.stopPropagation();addTpToOldal(oldal,mm);picker.remove();};
+    picker.appendChild(btn);
+  });
+  const closeBtn=document.createElement('button');
+  closeBtn.textContent='✕';
+  closeBtn.style.cssText='background:transparent;border:1px solid var(--gray2);color:var(--silver);padding:6px 10px;cursor:pointer;font-size:12px;';
+  closeBtn.onclick=(e)=>{e.stopPropagation();picker.remove();};
+  picker.appendChild(closeBtn);
+  // Position near tags
+  const rect=tagsEl.getBoundingClientRect();
+  picker.style.top=(rect.bottom+6)+'px';
+  picker.style.left=rect.left+'px';
+  document.body.appendChild(picker);
+  const close=()=>{if(document.getElementById('tp-picker-popup'))picker.remove();document.removeEventListener('click',close);};
+  setTimeout(()=>document.addEventListener('click',close),100);
+}
+
+function addTpToOldal(oldal,mm){
+  if(!tpEgyediData[oldal]) tpEgyediData[oldal]=[];
+  tpEgyediData[oldal].push(mm);
+  renderTpEgyediTags();
+}
+
+function removeTpFromOldal(oldal,idx){
+  tpEgyediData[oldal].splice(idx,1);
+  renderTpEgyediTags();
+}
+
+function renderTpEgyediTags(){
+  ['bal','fent','jobb','alul'].forEach(o=>{
+    const el=document.getElementById('tp-'+o+'-tags'); if(!el) return;
+    const vals=tpEgyediData[o]||[];
+    el.innerHTML=vals.length===0
+      ?'<span style="font-size:11px;color:var(--gray3);">+ kattints</span>'
+      :vals.map((v,i)=>`<span class="tp-mm-tag" onclick="event.stopPropagation();removeTpFromOldal('${o}',${i})">${v}mm <span class="tp-remove">✕</span></span>`).join('')+
+       `<span class="tp-add-btn" onclick="event.stopPropagation();openTpPicker('${o}')">+</span>`;
+  });
+}
+
+function getTpItemData(){
+  const checked=document.getElementById('t-tp')?.checked;
+  if(!checked) return null;
+  const tipus=document.getElementById('f-tp-tipus').value;
+  const elhelyezes=document.getElementById('f-tp-elhelyezes').value;
+  if(!tipus) return null;
+  const obj={tipus,elhelyezes};
+  if(tipus==='kt'||tipus==='vako'){
+    const s=(tipus==='kt'?db.tp?.kt:db.tp?.vako)||{};
+    obj.sablon={...s};
+    obj.display=formatTpSablon(s);
+  } else if(tipus==='egyedi'){
+    obj.egyedi={...tpEgyediData};
+    obj.display=formatTpEgyediDisplay(tpEgyediData);
+  }
+  return obj;
+}
+
+function formatTpEgyediDisplay(data){
+  const fmt=o=>(data[o]||[]).map(v=>v+'mm').join('+') || '0';
+  return `${fmt('bal')} / ${fmt('fent')} / ${fmt('jobb')} / ${fmt('alul')}`;
+}
+
+function clearTpForm(){
+  const tCheck=document.getElementById('t-tp');
+  if(tCheck){tCheck.checked=false;}
+  toggleCond('tp-sec',false);
+  document.getElementById('f-tp-tipus').value='';
+  document.getElementById('f-tp-elhelyezes').value='';
+  document.getElementById('tp-sablon-display').style.display='none';
+  document.getElementById('tp-egyedi-sec').style.display='none';
+  tpEgyediData={bal:[],fent:[],jobb:[],alul:[]};
+  renderTpEgyediTags();
+}
+
+// ─── Admin TP ───
+function loadTpAdmin(){
+  // mm lista
+  const list=document.getElementById('tp-mm-list'); if(!list) return;
+  const vals=(db.tp?.mm_ertekek||[]).sort((a,b)=>a-b);
+  list.innerHTML=vals.length===0?'<li style="color:var(--gray3);padding:6px 0;font-size:13px;">Nincs mm érték</li>':
+    vals.map(v=>`<li class="option-item"><div class="option-item-name">${v} mm</div><button class="btn btn-icon" onclick="deleteTpMm(${v})">🗑</button></li>`).join('');
+  // KT sablon
+  const kt=db.tp?.kt||{};
+  ['bal','fent','jobb','alul'].forEach(o=>{
+    const el=document.getElementById('tp-kt-'+o);if(el)el.value=kt[o]||'';
+  });
+  updateTpPreview('kt');
+  // VAKO sablon
+  const vako=db.tp?.vako||{};
+  ['bal','fent','jobb','alul'].forEach(o=>{
+    const el=document.getElementById('tp-vako-'+o);if(el)el.value=vako[o]||'';
+  });
+  updateTpPreview('vako');
+}
+
+function addTpMm(){
+  const val=parseInt(document.getElementById('tp-mm-new').value);
+  if(!val||val<1){toast('Adj meg érvényes mm értéket!');return;}
+  if(!db.tp) db.tp={mm_ertekek:[],kt:{bal:'',fent:'',jobb:'',alul:''},vako:{bal:'',fent:'',jobb:'',alul:''}};
+  if(db.tp.mm_ertekek.includes(val)){toast('Ez az érték már szerepel!');return;}
+  db.tp.mm_ertekek.push(val);
+  saveDB(); loadTpAdmin();
+  document.getElementById('tp-mm-new').value='';
+  toast('✅ '+val+'mm hozzáadva');
+}
+
+function deleteTpMm(val){
+  if(!confirm('Törlöd: '+val+'mm?')) return;
+  if(!db.tp) return;
+  db.tp.mm_ertekek=db.tp.mm_ertekek.filter(x=>x!==val);
+  saveDB(); loadTpAdmin(); toast('🗑 Törölve');
+}
+
+function saveTpSablonok(){
+  if(!db.tp) db.tp={mm_ertekek:[],kt:{},vako:{}};
+  ['bal','fent','jobb','alul'].forEach(o=>{
+    const ktEl=document.getElementById('tp-kt-'+o);
+    const vakoEl=document.getElementById('tp-vako-'+o);
+    if(ktEl) db.tp.kt[o]=ktEl.value.trim();
+    if(vakoEl) db.tp.vako[o]=vakoEl.value.trim();
+  });
+  saveDB();
+  updateTpPreview('kt');
+  updateTpPreview('vako');
+}
+
+function updateTpPreview(type){
+  const el=document.getElementById('tp-'+type+'-preview'); if(!el) return;
+  const s=db.tp?.[type]||{};
+  el.textContent=formatTpSablon(s);
+}
+
+// ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
 window.addEventListener('load',()=>{
+  // Ensure tp exists
+  if(!db.tp) db.tp={mm_ertekek:[36,50,58,70,100],kt:{bal:'36',fent:'58+36',jobb:'36',alul:'0'},vako:{bal:'36',fent:'0',jobb:'36',alul:'0'}};
   // Auto belépés
   currentUser=db.users.find(x=>x.role==='admin')||{username:'admin',role:'admin',nev:'Felmérő'};
   document.getElementById('header-username').textContent=currentUser.nev||currentUser.username;
