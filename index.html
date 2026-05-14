@@ -941,13 +941,13 @@ textarea{resize:vertical;min-height:70px;}
         </div>
         <div class="admin-section-body">
           <div class="grid-2">
-            <div class="form-group"><label>Cég neve</label><input type="text" id="a-cegnev"></div>
-            <div class="form-group"><label>Iroda email</label><input type="email" id="a-email"></div>
-            <div class="form-group"><label>Telefon</label><input type="text" id="a-tel"></div>
-            <div class="form-group"><label>Webcím</label><input type="text" id="a-web"></div>
-            <div class="form-group" style="grid-column:1/-1;"><label>Cím</label><input type="text" id="a-cegcim"></div>
+            <div class="form-group"><label>Cég neve</label><input type="text" id="a-cegnev" oninput="saveCegAdatok()"></div>
+            <div class="form-group"><label>Iroda email</label><input type="email" id="a-email" oninput="saveCegAdatok()"></div>
+            <div class="form-group"><label>Telefon</label><input type="text" id="a-tel" oninput="saveCegAdatok()"></div>
+            <div class="form-group"><label>Webcím</label><input type="text" id="a-web" oninput="saveCegAdatok()"></div>
+            <div class="form-group" style="grid-column:1/-1;"><label>Cím</label><input type="text" id="a-cegcim" oninput="saveCegAdatok()"></div>
           </div>
-          <button class="btn btn-primary btn-small" onclick="saveCegAdatok()">Mentés</button>
+          <div style="font-size:12px;color:var(--silver);">💾 Automatikusan ment gépelés közben</div>
         </div>
       </div>
 
