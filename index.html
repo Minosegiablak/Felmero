@@ -230,7 +230,7 @@ textarea{resize:vertical;min-height:70px;}
 
 <!-- HEADER -->
 <div id="app-header" style="display:none;">
-  <div class="header-logo">Nyilász<span>á</span>ró <span>▸</span> Felmérő</div>
+  <div class="header-logo">Nyilász<span>á</span>ró <span>▸</span> Felmérő <span style="font-size:11px;color:var(--gray3);font-family:'Share Tech Mono',monospace;font-weight:400;letter-spacing:1px;margin-left:6px;">v2.1</span></div>
   <div class="header-right">
     <div class="autosave" id="autosave-indicator">💾 Mentve</div>
     <span class="header-user" id="header-username"></span>
@@ -1070,9 +1070,9 @@ textarea{resize:vertical;min-height:70px;}
             <div class="info-box">Ezek lesznek választhatók egyedi TP esetén oldalanként.</div>
             <ul class="option-list" id="tp-mm-list"></ul>
             <div class="sep"></div>
-            <div style="display:flex;gap:10px;align-items:flex-end;">
-              <div class="form-group" style="margin:0;flex:1;"><label>Új mm érték</label><input type="number" id="tp-mm-new" placeholder="pl. 36" min="1" max="999"></div>
-              <button class="btn btn-primary btn-small" onclick="addTpMm()" style="height:44px;">+ Hozzáadás</button>
+            <div class="grid-2">
+              <div class="form-group" style="margin:0;"><label>Új mm érték</label><input type="number" id="tp-mm-new" placeholder="pl. 36" min="1" max="999"></div>
+              <div style="display:flex;align-items:flex-end;"><button class="btn btn-primary btn-small" onclick="addTpMm()" style="width:100%;height:46px;">+ Hozzáadás</button></div>
             </div>
           </div>
           <div class="sep"></div>
@@ -2891,8 +2891,15 @@ function updateTpPreview(type){
 //  INIT
 // ═══════════════════════════════════════════
 window.addEventListener('load',()=>{
-  // Ensure tp exists
+  // DB migráció: hiányzó kulcsok pótlása DEFAULT_DB-ből
   if(!db.tp) db.tp={mm_ertekek:[36,50,58,70,100],kt:{bal:'36',fent:'58+36',jobb:'36',alul:'0'},vako:{bal:'36',fent:'0',jobb:'36',alul:'0'}};
+  if(!db.options) db.options={};
+  Object.keys(DEFAULT_DB.options).forEach(key=>{
+    if(!db.options[key]||db.options[key].length===0){
+      db.options[key]=JSON.parse(JSON.stringify(DEFAULT_DB.options[key]));
+    }
+  });
+  saveDB();
   // Auto belépés
   currentUser=db.users.find(x=>x.role==='admin')||{username:'admin',role:'admin',nev:'Felmérő'};
   document.getElementById('header-username').textContent=currentUser.nev||currentUser.username;
