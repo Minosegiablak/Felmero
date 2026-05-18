@@ -200,6 +200,10 @@ textarea{resize:vertical;min-height:70px;}
 .helyszin-select{width:100%;background:var(--dark2);border:1px solid var(--gray2);color:#fff;padding:10px 12px;font-size:14px;border-radius:0;-webkit-appearance:none;outline:none;}
 .helyszin-select:focus{border-color:var(--red);}
 
+/* MŰSZAKI ADATOK GOMBOK */
+.muszaki-btns{display:flex;gap:10px;margin-bottom:14px;margin-top:4px;}
+.muszaki-btns .btn{font-size:13px;padding:10px 14px;}
+
 /* EXTRA BEÁLLÍTÁS GOMBOK */
 .extra-btns-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);margin-top:18px;margin-bottom:10px;}
 .extra-btns{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
@@ -473,6 +477,26 @@ textarea{resize:vertical;min-height:70px;}
           <!-- ABLAK / BEJÁRATI AJTÓ -->
           <div id="sec-ablak" class="cond-field">
             <div class="sep"></div>
+
+            <!-- Műszaki adatok gombok -->
+            <div class="muszaki-btns" id="muszaki-btns">
+              <button type="button" class="btn btn-secondary" id="btn-copy-prev" onclick="copyPrevMuszaki()" style="flex:1;gap:8px;">
+                <span>📋</span> Előző másolása
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-new-muszaki" onclick="toggleMuszakiForm()" style="flex:1;gap:8px;">
+                <span>⚙️</span> Új műszaki adatok
+              </button>
+            </div>
+
+            <!-- Műszaki összefoglaló (másolás után látszik) -->
+            <div id="muszaki-summary" style="display:none;background:var(--dark2);border:1px solid var(--gray2);border-left:3px solid var(--red);padding:12px 14px;margin-bottom:10px;">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);margin-bottom:8px;">Műszaki tartalom</div>
+              <div id="muszaki-summary-text" style="font-size:14px;color:var(--light);line-height:1.8;"></div>
+              <button type="button" onclick="toggleMuszakiForm()" style="margin-top:8px;background:transparent;border:none;color:var(--red3);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;padding:0;">✏️ Módosítás</button>
+            </div>
+
+            <!-- Műszaki adatok form (alapból rejtve) -->
+            <div id="muszaki-form" style="display:none;">
             <div class="grid-2">
               <div class="form-group">
                 <label>Tokprofil</label>
@@ -532,6 +556,7 @@ textarea{resize:vertical;min-height:70px;}
                 </select>
               </div>
             </div>
+            </div><!-- /muszaki-form -->
 
             <!-- Extra beállítások - ikonos gombok -->
             <div class="extra-btns-label">Extra beállítások</div>
@@ -1488,7 +1513,13 @@ function selectType(id,btn){
   document.querySelectorAll('[id^="sec-"]').forEach(s=>s.classList.remove('visible'));
   if(t) t.secs.forEach(s=>{const el=document.getElementById(s);if(el)el.classList.add('visible');});
   // Alapkészlet betöltése ablakhoz
-  if(id==='ablak'||id==='bejajto') applyAlapkeszlet();
+  if(id==='ablak'||id==='bejajto') {
+    applyAlapkeszlet();
+    showMuszakiBtns(true);
+    resetMuszakiUI();
+  } else {
+    showMuszakiBtns(false);
+  }
   updateExtraBtnsVisibility(id);
   setTimeout(()=>document.getElementById('item-form').scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
@@ -1536,6 +1567,7 @@ function clearItemForm(){
   document.getElementById('t-oszto').checked=false;
   document.getElementById('t-pf').checked=false;
   clearAllExtraModals();
+  resetMuszakiUI();
   document.querySelectorAll('#item-form select').forEach(s=>s.selectedIndex=0);
   currentFotoBase64=null;
   document.getElementById('f-foto').value='';
@@ -2610,6 +2642,104 @@ function importJSON(input){
     input.value='';
   };
   reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════
+//  MŰSZAKI ADATOK KEZELÉS
+// ═══════════════════════════════════════════
+
+let muszakiFormOpen = false;
+
+function toggleMuszakiForm(forceOpen) {
+  muszakiFormOpen = forceOpen !== undefined ? forceOpen : !muszakiFormOpen;
+  const form = document.getElementById('muszaki-form');
+  if(form) {
+    form.style.display = muszakiFormOpen ? 'block' : 'none';
+    // Apply alapkeszlet when opening fresh (no values set yet)
+    if(muszakiFormOpen) {
+      const profil = document.getElementById('f-profil');
+      if(profil && !profil.value) applyAlapkeszlet();
+    }
+  }
+}
+
+function getMuszakiFields() {
+  return {
+    profil: document.getElementById('f-profil')?.value || '',
+    uveg: document.getElementById('f-uveg')?.value || '',
+    uvegOsztaly: document.getElementById('f-uveg-osztaly')?.value || '',
+    nyitas: document.getElementById('f-nyitas')?.value || '',
+    irany: document.getElementById('f-irany')?.value || '',
+    szin: document.getElementById('f-szin')?.value || '',
+    tokbeep: document.getElementById('f-tokbeep')?.value || '',
+    takaroles: document.getElementById('f-takaroles')?.value || '',
+  };
+}
+
+function setMuszakiFields(data) {
+  if(!data) return;
+  if(data.profil) setSelectVal('f-profil', data.profil);
+  if(data.uveg) setSelectVal('f-uveg', data.uveg);
+  if(data.uvegOsztaly) setSelectVal('f-uveg-osztaly', data.uvegOsztaly);
+  if(data.nyitas) setSelectVal('f-nyitas', data.nyitas);
+  if(data.irany) setSelectVal('f-irany', data.irany);
+  if(data.szin) setSelectVal('f-szin', data.szin);
+  if(data.tokbeep) setSelectVal('f-tokbeep', data.tokbeep);
+  if(data.takaroles) setSelectVal('f-takaroles', data.takaroles);
+}
+
+function renderMuszakiSummary(data) {
+  const el = document.getElementById('muszaki-summary-text');
+  if(!el || !data) return;
+  const lines = [
+    data.profil && `Profil: ${data.profil}`,
+    data.uveg && `Üveg: ${data.uveg}`,
+    data.uvegOsztaly && `Osztály: ${data.uvegOsztaly}`,
+    data.nyitas && `Nyitás: ${data.nyitas}`,
+    data.irany && `Irány: ${data.irany}`,
+    data.szin && `Szín: ${data.szin}`,
+    data.tokbeep && `Tokbeépítés: ${data.tokbeep}`,
+    data.takaroles && `Takaróléc: ${data.takaroles}`,
+  ].filter(Boolean);
+  el.innerHTML = lines.join('<br>');
+}
+
+function copyPrevMuszaki() {
+  // Find last ablak/bejajto item
+  const prev = [...items].reverse().find(i => !i.isSzerkezet && (i.tipus==='ablak'||i.tipus==='bejajto'));
+  if(!prev) { toast('Nincs korábbi ablak tétel!'); return; }
+  const data = {
+    profil: prev.profil||'', uveg: prev.uveg||'', uvegOsztaly: prev.uvegOsztaly||'',
+    nyitas: prev.nyitas||'', irany: prev.irany||'', szin: prev.szin||'',
+    tokbeep: prev.tokbeep||'', takaroles: prev.takaroles||'',
+  };
+  setMuszakiFields(data);
+  renderMuszakiSummary(data);
+  document.getElementById('muszaki-summary').style.display = 'block';
+  document.getElementById('muszaki-form').style.display = 'none';
+  muszakiFormOpen = false;
+  toast('✅ Előző ablak műszaki adatai másolva!');
+}
+
+function showMuszakiBtns(show) {
+  const el = document.getElementById('muszaki-btns');
+  if(el) el.style.display = show ? 'flex' : 'none';
+  // If no previous ablak exists, disable copy button
+  if(show) {
+    const hasPrev = items.some(i => !i.isSzerkezet && (i.tipus==='ablak'||i.tipus==='bejajto'));
+    const copyBtn = document.getElementById('btn-copy-prev');
+    if(copyBtn) {
+      copyBtn.disabled = !hasPrev;
+      copyBtn.style.opacity = hasPrev ? '1' : '0.4';
+      copyBtn.title = hasPrev ? '' : 'Még nincs korábbi ablak tétel';
+    }
+  }
+}
+
+function resetMuszakiUI() {
+  document.getElementById('muszaki-summary').style.display = 'none';
+  document.getElementById('muszaki-form').style.display = 'none';
+  muszakiFormOpen = false;
 }
 
 // ═══════════════════════════════════════════
