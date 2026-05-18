@@ -55,7 +55,7 @@ select option{background:var(--dark2);color:var(--white);}
 textarea{resize:vertical;min-height:70px;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr;} .ugyfel-grid{grid-template-columns:1fr !important;}}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all .2s;}
@@ -200,8 +200,15 @@ textarea{resize:vertical;min-height:70px;}
 .helyszin-select{width:100%;background:var(--dark2);border:1px solid var(--gray2);color:#fff;padding:10px 12px;font-size:14px;border-radius:0;-webkit-appearance:none;outline:none;}
 .helyszin-select:focus{border-color:var(--red);}
 
+.collapsible-head{cursor:pointer;user-select:none;}
+.collapsible-head:hover h2{color:var(--red3);}
+.collapse-arrow{font-size:13px;color:var(--silver);margin-left:auto;transition:transform .2s;flex-shrink:0;}
+.collapsible-body{overflow:hidden;transition:max-height .3s ease,padding .3s ease,opacity .2s;}
+.collapsible-body.collapsed{display:none;}
+
 /* MŰSZAKI ADATOK GOMBOK */
-.muszaki-btns{display:flex;gap:10px;margin-bottom:14px;margin-top:4px;}
+.type-btn-disabled{cursor:not-allowed !important;border-color:var(--gray2) !important;background:var(--dark2) !important;}
+.type-btn-disabled:hover{border-color:var(--gray2) !important;}
 .muszaki-btns .btn{font-size:13px;padding:10px 14px;}
 
 /* EXTRA BEÁLLÍTÁS GOMBOK */
@@ -291,48 +298,98 @@ textarea{resize:vertical;min-height:70px;}
       </div>
 
       <!-- Ügyfél adatok -->
-      <div class="section-head"><h2>Ügyfél adatai</h2></div>
-      <div class="card">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Munka típusa *</label>
-            <select id="u-munkatipus" onchange="autoSave()">
-              <option value="">— Válasszon —</option>
-              <option value="bontás+beépítés">🔨 Bontás + beépítés</option>
-              <option value="csak beépítés">🏗️ Csak beépítés (új építés)</option>
-              <option value="tokba építés">📐 Tokba építés</option>
-            </select>
+      <div class="section-head collapsible-head" onclick="toggleSection('ugyfel-body','ugyfel-arrow')">
+        <h2>Ügyfél adatai</h2>
+        <span id="ugyfel-arrow" class="collapse-arrow">▲</span>
+      </div>
+      <div id="ugyfel-body" class="card collapsible-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+          <!-- BAL: Ügyfél -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);margin-bottom:12px;">Ügyfél</div>
+            <div class="form-group">
+              <label>Ügyfél neve *</label>
+              <input type="text" id="u-nev" placeholder="Kovács Péter" oninput="autoSave();syncSzamlazas()">
+            </div>
+            <div class="form-group">
+              <label>
+                Cím
+                <button type="button" onclick="getGPS()" id="gps-btn" style="margin-left:6px;background:var(--red);border:none;color:#fff;padding:2px 8px;font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;vertical-align:middle;">📍 GPS</button>
+                <span id="gps-status" style="font-size:10px;color:var(--silver);margin-left:4px;"></span>
+              </label>
+              <input type="text" id="u-cim" placeholder="1234 Budapest, Fő u. 1." oninput="autoSave();syncSzamlazas()">
+            </div>
+            <div class="form-group">
+              <label>Telefonszám</label>
+              <input type="text" id="u-tel" placeholder="+36 30 123 4567" oninput="autoSave()">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="u-email" placeholder="kovacs@email.hu" oninput="autoSave()">
+            </div>
+
+            <!-- Számlázási adatok -->
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray2);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);">Számlázási adatok</div>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--silver);">
+                  <input type="checkbox" id="szamlazas-uaz" onchange="toggleSzamlazasUaz(this.checked)" checked>
+                  <span>U.a. mint fent</span>
+                </label>
+              </div>
+              <div id="szamlazas-form" style="display:none;">
+                <div class="form-group">
+                  <label>Számlázási név</label>
+                  <input type="text" id="u-szamlazas-nev" placeholder="Kovács Péter" oninput="autoSave()">
+                </div>
+                <div class="form-group">
+                  <label>Számlázási cím</label>
+                  <input type="text" id="u-szamlazas-cim" placeholder="1234 Budapest, Fő u. 1." oninput="autoSave()">
+                </div>
+                <div class="form-group">
+                  <label>Adószám</label>
+                  <input type="text" id="u-adoszam" placeholder="12345678-1-42" oninput="autoSave()">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Ügyfél neve *</label>
-            <input type="text" id="u-nev" placeholder="Kovács Péter" oninput="autoSave()">
+
+          <!-- JOBB: Munka adatai -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);margin-bottom:12px;">A munkáról</div>
+            <div class="form-group">
+              <label>Munka típusa *</label>
+              <select id="u-munkatipus" onchange="autoSave()">
+                <option value="">— Válasszon —</option>
+                <option value="bontás+beépítés">🔨 Bontás + beépítés</option>
+                <option value="csak beépítés">🏗️ Csak beépítés (új építés)</option>
+                <option value="tokba építés">📐 Tokba építés</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Felmérő neve</label>
+              <input type="text" id="u-felmero" oninput="autoSave()">
+            </div>
+            <div class="form-group">
+              <label>Dátum</label>
+              <input type="text" id="u-datum" oninput="autoSave()">
+            </div>
+            <div class="form-group" style="margin-top:14px;">
+              <label>Megjegyzés</label>
+              <textarea id="u-megj" placeholder="Szabad megjegyzés a munkáról, helyszínről..." oninput="autoSave()" style="min-height:120px;resize:vertical;"></textarea>
+            </div>
           </div>
-          <div class="form-group">
-            <label>
-              Helyszín / Cím
-              <button type="button" onclick="getGPS()" id="gps-btn" style="margin-left:6px;background:var(--red);border:none;color:#fff;padding:2px 8px;font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;vertical-align:middle;">📍 GPS</button>
-              <span id="gps-status" style="font-size:10px;color:var(--silver);margin-left:4px;"></span>
-            </label>
-            <input type="text" id="u-cim" placeholder="1234 Budapest, Fő u. 1." oninput="autoSave()">
-          </div>
-          <div class="form-group">
-            <label>Felmérő neve</label>
-            <input type="text" id="u-felmero" oninput="autoSave()">
-          </div>
-          <div class="form-group">
-            <label>Dátum</label>
-            <input type="text" id="u-datum" oninput="autoSave()">
-          </div>
-          <div class="form-group">
-            <label>Telefon</label>
-            <input type="text" id="u-tel" placeholder="+36 30 123 4567" oninput="autoSave()">
-          </div>
+
         </div>
       </div>
 
       <!-- Helyszín infók -->
-      <div class="section-head"><h2>Helyszín információk</h2></div>
-      <div class="card">
+      <div class="section-head collapsible-head" onclick="toggleSection('helyszin-body','helyszin-arrow')">
+        <h2>Helyszín információk</h2>
+        <span id="helyszin-arrow" class="collapse-arrow">▲</span>
+      </div>
+      <div id="helyszin-body" class="card collapsible-body">
         <div id="helyszin-info-container"></div>
       </div>
 
@@ -594,6 +651,52 @@ textarea{resize:vertical;min-height:70px;}
               <input type="checkbox" id="t-szunyog">
               <input type="checkbox" id="t-tp">
               <input type="checkbox" id="t-oszto">
+            </div>
+          </div>
+
+          <!-- PÁRKÁNY -->
+          <div id="sec-parkany" class="cond-field">
+            <div class="sep"></div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Párkány típus</label>
+                <select id="f-parkany-tipus"></select>
+              </div>
+              <div class="form-group">
+                <label>Anyag / Szín</label>
+                <select id="f-parkany-szin"></select>
+              </div>
+              <div class="form-group">
+                <label>Szélesség (mm)</label>
+                <input type="number" id="f-parkany-sz" placeholder="pl. 300">
+              </div>
+              <div class="form-group">
+                <label>Hossz (mm)</label>
+                <input type="number" id="f-parkany-hossz" placeholder="pl. 1200">
+              </div>
+            </div>
+          </div>
+
+          <!-- KÖNYÖKLŐ -->
+          <div id="sec-konyoklo" class="cond-field">
+            <div class="sep"></div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Könyöklő típus</label>
+                <select id="f-konyoklo-tipus"></select>
+              </div>
+              <div class="form-group">
+                <label>Anyag / Szín</label>
+                <select id="f-konyoklo-szin"></select>
+              </div>
+              <div class="form-group">
+                <label>Szélesség (mm)</label>
+                <input type="number" id="f-konyoklo-sz" placeholder="pl. 200">
+              </div>
+              <div class="form-group">
+                <label>Hossz (mm)</label>
+                <input type="number" id="f-konyoklo-hossz" placeholder="pl. 1200">
+              </div>
             </div>
           </div>
 
@@ -879,7 +982,7 @@ textarea{resize:vertical;min-height:70px;}
           </div>
 
           <div style="display:flex;gap:10px;margin-top:12px;">
-            <button class="btn btn-primary" onclick="saveItem()" style="flex:1;">+ Tétel mentése</button>
+            <button class="btn btn-primary" id="btn-save-item" onclick="saveItem()" style="flex:1;">+ Tétel mentése</button>
             <button class="btn btn-secondary" onclick="cancelItemForm()">Mégsem</button>
           </div>
         </div>
@@ -1238,6 +1341,18 @@ const DEFAULT_DB = {
     redony_elhelyezések:[
       {nev:'Méreten belül (MB)',sub:''},{nev:'Méreten kívül (MK)',sub:''},
     ],
+    parkany_tipusok:[
+      {nev:'Belső párkány',sub:''},{nev:'Külső párkány',sub:''},
+    ],
+    parkany_szinek:[
+      {nev:'Fehér',sub:''},{nev:'Antracit',sub:''},{nev:'Barna',sub:''},
+    ],
+    konyoklo_tipusok:[
+      {nev:'Kő könyöklő',sub:''},{nev:'Műkő könyöklő',sub:''},{nev:'Klinker',sub:''},
+    ],
+    konyoklo_szinek:[
+      {nev:'Fehér',sub:''},{nev:'Szürke',sub:''},{nev:'Antracit',sub:''},
+    ],
     szunyoghalo_rogzitesek:[
       {nev:'Fix (keret)',sub:''},{nev:'Nyíló (szárnyba)',sub:''},
       {nev:'Felcsévélős',sub:''},{nev:'Plisszé',sub:''},
@@ -1320,6 +1435,14 @@ function saveItems(){ localStorage.setItem('nf_items', JSON.stringify(items)); }
 // ═══════════════════════════════════════════
 //  AUTOSAVE
 // ═══════════════════════════════════════════
+function toggleSection(bodyId, arrowId){
+  const body=document.getElementById(bodyId);
+  const arrow=document.getElementById(arrowId);
+  if(!body) return;
+  const collapsed=body.classList.toggle('collapsed');
+  if(arrow) arrow.textContent=collapsed?'▼':'▲';
+}
+
 function autoSave(){
   const ind = document.getElementById('autosave-indicator');
   if(ind){ ind.textContent='⏳ Mentés...'; ind.className='autosave saving'; }
@@ -1336,12 +1459,18 @@ function saveUgyfelAdatok(){
   const u = {
     nev: document.getElementById('u-nev')?.value||'',
     cim: document.getElementById('u-cim')?.value||'',
+    tel: document.getElementById('u-tel')?.value||'',
+    email: document.getElementById('u-email')?.value||'',
     felmero: document.getElementById('u-felmero')?.value||'',
     datum: document.getElementById('u-datum')?.value||'',
-    tel: document.getElementById('u-tel')?.value||'',
     munkatipus: document.getElementById('u-munkatipus')?.value||'',
+    megj: document.getElementById('u-megj')?.value||'',
     altmegj: document.getElementById('u-altmegj')?.value||'',
     statusz: document.getElementById('statusz-select')?.value||'',
+    szamlazasUaz: document.getElementById('szamlazas-uaz')?.checked!==false,
+    szamlazasNev: document.getElementById('u-szamlazas-nev')?.value||'',
+    szamlazasCim: document.getElementById('u-szamlazas-cim')?.value||'',
+    adoszam: document.getElementById('u-adoszam')?.value||'',
   };
   localStorage.setItem('nf_ugyfel', JSON.stringify(u));
 }
@@ -1350,12 +1479,39 @@ function loadUgyfelAdatok(){
   const u = JSON.parse(localStorage.getItem('nf_ugyfel')||'{}');
   if(u.nev) document.getElementById('u-nev').value=u.nev;
   if(u.cim) document.getElementById('u-cim').value=u.cim;
+  if(u.tel) document.getElementById('u-tel').value=u.tel;
+  if(u.email) document.getElementById('u-email').value=u.email;
   if(u.felmero) document.getElementById('u-felmero').value=u.felmero;
   if(u.datum) document.getElementById('u-datum').value=u.datum;
-  if(u.tel) document.getElementById('u-tel').value=u.tel;
   if(u.munkatipus) document.getElementById('u-munkatipus').value=u.munkatipus;
-  if(u.altmegj) document.getElementById('u-altmegj').value=u.altmegj;
+  if(u.megj) document.getElementById('u-megj').value=u.megj;
+  if(u.altmegj && document.getElementById('u-altmegj')) document.getElementById('u-altmegj').value=u.altmegj;
   if(u.statusz){ document.getElementById('statusz-select').value=u.statusz; setStatusz(u.statusz); }
+  // Számlázás
+  const uaz = u.szamlazasUaz !== false;
+  document.getElementById('szamlazas-uaz').checked = uaz;
+  document.getElementById('szamlazas-form').style.display = uaz ? 'none' : 'block';
+  if(u.szamlazasNev) document.getElementById('u-szamlazas-nev').value=u.szamlazasNev;
+  if(u.szamlazasCim) document.getElementById('u-szamlazas-cim').value=u.szamlazasCim;
+  if(u.adoszam) document.getElementById('u-adoszam').value=u.adoszam;
+}
+
+function toggleSzamlazasUaz(checked){
+  document.getElementById('szamlazas-form').style.display = checked ? 'none' : 'block';
+  if(!checked){
+    // Pre-fill with ügyfél data
+    const nev=document.getElementById('u-nev').value;
+    const cim=document.getElementById('u-cim').value;
+    if(nev && !document.getElementById('u-szamlazas-nev').value) document.getElementById('u-szamlazas-nev').value=nev;
+    if(cim && !document.getElementById('u-szamlazas-cim').value) document.getElementById('u-szamlazas-cim').value=cim;
+  }
+  autoSave();
+}
+
+function syncSzamlazas(){
+  // If "u.a." is checked, keep számlázási fields in sync
+  if(document.getElementById('szamlazas-uaz')?.checked) return;
+  // Don't sync if user has manually filled in different values
 }
 
 // ═══════════════════════════════════════════
@@ -1485,19 +1641,27 @@ function getHelyszinValaszok(){
 // ═══════════════════════════════════════════
 const TYPES=[
   {id:'ablak',label:'Ablak',icon:'🪟',secs:['sec-ablak']},
-  {id:'bejajto',label:'Bejárati ajtó',icon:'🚪',secs:['sec-ablak']},
-  {id:'belsoajto',label:'Belső ajtó',icon:'🚪',secs:['sec-belsoajto']},
+  {id:'parkany',label:'Párkány',icon:'📏',secs:['sec-parkany']},
+  {id:'konyoklo',label:'Könyöklő',icon:'🪨',secs:['sec-konyoklo']},
+  {id:'bejajto',label:'Bejárati ajtó',icon:'🚪',secs:['sec-ablak'],hamarosan:true},
+  {id:'belsoajto',label:'Belső ajtó',icon:'🚪',secs:['sec-belsoajto'],hamarosan:true},
   {id:'redony',label:'Redőny',icon:'🔲',secs:['sec-redony']},
-  {id:'rolo',label:'Roló',icon:'🟫',secs:['sec-rolo']},
-  {id:'zsaluzia',label:'Zsalúzia',icon:'🔳',secs:['sec-zsaluzia']},
+  {id:'rolo',label:'Roló',icon:'🟫',secs:['sec-rolo'],hamarosan:true},
+  {id:'zsaluzia',label:'Zsalúzia',icon:'🔳',secs:['sec-zsaluzia'],hamarosan:true},
   {id:'szunyoghalo',label:'Szúnyogháló',icon:'🕸️',secs:['sec-szunyoghalo']},
-  {id:'garazs',label:'Garázskapu',icon:'🏠',secs:['sec-garazs']},
-  {id:'pergola',label:'Pergola',icon:'⛱️',secs:['sec-pergola']},
+  {id:'garazs',label:'Garázskapu',icon:'🏠',secs:['sec-garazs'],hamarosan:true},
+  {id:'pergola',label:'Pergola',icon:'⛱️',secs:['sec-pergola'],hamarosan:true},
 ];
 
 function initTypeGrid(){
   const g=document.getElementById('type-grid');
-  g.innerHTML=TYPES.map(t=>`
+  g.innerHTML=TYPES.map(t=>t.hamarosan?`
+    <button class="type-btn type-btn-disabled" disabled title="Hamarosan elérhető">
+      <span class="type-icon" style="opacity:.5;">${t.icon}</span>
+      <span style="opacity:.5;">${t.label}</span>
+      <span style="display:block;font-size:9px;color:var(--gray3);letter-spacing:1px;margin-top:2px;">HAMAROSAN</span>
+    </button>
+  `:`
     <button class="type-btn" onclick="selectType('${t.id}',this)">
       <span class="type-icon">${t.icon}</span>${t.label}
     </button>
@@ -1551,7 +1715,9 @@ function setSelectVal(id,val){
 function cancelItemForm(){
   document.getElementById('item-form').style.display='none';
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
-  currentType=null; clearItemForm();
+  currentType=null; editingIndex=null; clearItemForm();
+  const saveBtn=document.getElementById('btn-save-item');
+  if(saveBtn) saveBtn.textContent='+ Tétel mentése';
 }
 
 function clearItemForm(){
@@ -1623,6 +1789,8 @@ function populateSelects(){
   fillSelect('f-redony-vez',o.redony_vezerlések);
   fillSelect('f-redony-elhelyezes',o.redony_elhelyezések);
   fillSelect('f-szunyog-tipus',o.szunyoghalo_tipusok);
+  fillSelect('f-parkany-tipus',o.parkany_tipusok||[]); fillSelect('f-parkany-szin',o.parkany_szinek||[]);
+  fillSelect('f-konyoklo-tipus',o.konyoklo_tipusok||[]); fillSelect('f-konyoklo-szin',o.konyoklo_szinek||[]);
   fillSelect('f-ajto-lap',o.ajto_lap_tipusok);
   fillSelect('f-ajto-tok',o.ajto_tok_tipusok);
   fillSelect('f-ajto-kilincs',o.ajto_kilincsek);
@@ -1700,6 +1868,8 @@ function saveItem(){
       item.redonyVez=document.getElementById('f-redony-vez').value;
       item.redonyLamella=document.getElementById('f-redony-lamella').value;
       item.redonyElhelyezes=document.getElementById('f-redony-elhelyezes').value;
+      item.redonySz=document.getElementById('f-redony-sz').value;
+      item.redonyMag=document.getElementById('f-redony-mag').value;
     }
     item.szunyog=document.getElementById('t-szunyog').checked;
     if(item.szunyog){
@@ -1711,6 +1881,18 @@ function saveItem(){
     if(item.oszto) item.osztoLeiras=document.getElementById('f-oszto').value;
     // Toktoldózás
     item.tp=getTpItemData();
+  }
+  if(currentType==='parkany'){
+    item.parkanyTipus=document.getElementById('f-parkany-tipus').value;
+    item.parkanySzin=document.getElementById('f-parkany-szin').value;
+    item.parkanySz=document.getElementById('f-parkany-sz').value;
+    item.parkanyHossz=document.getElementById('f-parkany-hossz').value;
+  }
+  if(currentType==='konyoklo'){
+    item.konyokloTipus=document.getElementById('f-konyoklo-tipus').value;
+    item.konyokloSzin=document.getElementById('f-konyoklo-szin').value;
+    item.konyokloSz=document.getElementById('f-konyoklo-sz').value;
+    item.konyokloHossz=document.getElementById('f-konyoklo-hossz').value;
   }
   if(currentType==='belsoajto'){
     item.ajtoLap=document.getElementById('f-ajto-lap').value;
@@ -1762,10 +1944,20 @@ function saveItem(){
     item.szunyogSzin=document.getElementById('f-szunyog-szin').value;
   }
 
-  items.push(item);
-  saveItems(); updateBadge(); cancelItemForm();
-  incrementCounter();
-  toast('✅ Tétel mentve!');
+  if(editingIndex!==null){
+    item.id=items[editingIndex].id;
+    item.foto=items[editingIndex].foto;
+    item.modifiedAt=Date.now();
+    items[editingIndex]=item;
+    editingIndex=null;
+    saveItems(); updateBadge(); cancelItemForm();
+    toast('✅ Tétel frissítve!');
+  } else {
+    items.push(item);
+    saveItems(); updateBadge(); cancelItemForm();
+    incrementCounter();
+    toast('✅ Tétel mentve!');
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1909,8 +2101,10 @@ function openEditModal(i){
     'PF profil':item.pf?`Igen – ${item.pfElhelyezes||''}`:undefined,
     'Toktoldózás (TP)':item.tp?`${item.tp.tipus==='kt'?'KT Red. előkész.':item.tp.tipus==='vako'?'VAKO Red. előkész.':'Egyedi'} [${item.tp.elhelyezes||''}] ${item.tp.display||''}`:undefined,
     'Redőny előkészítés':item.redonyPrep?'IGEN':undefined,
-    'Redőny típus':item.redonyTipus,'Redőny vezérlés':item.redonyVez,
-    'Redőny lamella':item.redonyLamella,'Redőny elhelyezés':item.redonyElhelyezes,
+    'Redőny típus':item.redonyTipus,'Működtetés':item.redonyVez,
+    'Redőny lamella':item.redonyLamella,'Betáp / gurtni oldal':item.redonyElhelyezes,
+    'Redőny szélesség':item.redonySz?item.redonySz+'mm':undefined,
+    'Redőny magasság':item.redonyMag?item.redonyMag+'mm':undefined,
     'Szúnyogháló':item.szunyog?'IGEN':undefined,
     'Szúnyogháló típus':item.szunyogTipus,
     'Szúnyogháló méret':item.szunyogSz&&item.szunyogM?`${item.szunyogSz}×${item.szunyogM}mm`:undefined,
@@ -1926,6 +2120,7 @@ function openEditModal(i){
     <div class="summary-block">
       ${rows.map(([k,v])=>`<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`).join('')}
     </div>
+    <button class="btn btn-secondary" style="width:100%;border-color:var(--orange);color:var(--orange);margin-bottom:14px;" onclick="startEditItem(${i})">✏️ Tétel szerkesztése</button>
     <div class="form-group">
       <label>Megjegyzés módosítása</label>
       <textarea id="edit-megj">${item.megj||''}</textarea>
@@ -1946,6 +2141,81 @@ function openEditModal(i){
       </div>`}
   `;
   document.getElementById('edit-modal').classList.add('active');
+}
+
+function startEditItem(i){
+  closeEditModal();
+  const item=items[i];
+  editingIndex=i;
+  showPage('page-felmeres', document.querySelector('.nav-tab'));
+  // Típus kiválasztása
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
+  const typeBtn=document.querySelector(`.type-btn[onclick*="'${item.tipus}'"]`);
+  if(typeBtn) typeBtn.classList.add('selected');
+  currentType=item.tipus;
+  document.getElementById('item-form').style.display='block';
+  document.getElementById('form-type-title').textContent=(TYPES.find(x=>x.id===item.tipus)?.label||'Tétel')+' – Szerkesztés';
+  document.querySelectorAll('[id^="sec-"]').forEach(s=>s.classList.remove('visible'));
+  const t=TYPES.find(x=>x.id===item.tipus);
+  if(t) t.secs.forEach(s=>{const el=document.getElementById(s);if(el)el.classList.add('visible');});
+  // Alap mezők
+  document.getElementById('f-helyiseg').value=item.helyiseg||'';
+  document.getElementById('f-szelesseg').value=item.szelesseg||'';
+  document.getElementById('f-magassag').value=item.magassag||'';
+  document.getElementById('f-db').value=item.db||1;
+  const fMegj=document.getElementById('f-megj'); if(fMegj) fMegj.value=item.megj||'';
+  // Ablak műszaki
+  if(item.tipus==='ablak'||item.tipus==='bejajto'){
+    showMuszakiBtns(true);
+    clearAllExtraModals();
+    if(item.profil||item.uveg){
+      setSelectVal('f-profil',item.profil||'');
+      setSelectVal('f-uveg',item.uveg||'');
+      setSelectVal('f-uveg-osztaly',item.uvegOsztaly||'');
+      setSelectVal('f-nyitas',item.nyitas||'');
+      setSelectVal('f-irany',item.irany||'');
+      setSelectVal('f-szin',item.szin||'');
+      setSelectVal('f-tokbeep',item.tokbeep||'');
+      setSelectVal('f-takaroles',item.takaroles||'');
+      renderMuszakiSummary({profil:item.profil,uveg:item.uveg,uvegOsztaly:item.uvegOsztaly,
+        nyitas:item.nyitas,irany:item.irany,szin:item.szin,tokbeep:item.tokbeep,takaroles:item.takaroles});
+      document.getElementById('muszaki-summary').style.display='block';
+      muszakiFormOpen=false;
+    }
+    updateExtraBtnsVisibility(item.tipus);
+    if(item.pf){document.getElementById('t-pf').checked=true;setSelectVal('f-pf-elhelyezes',item.pfElhelyezes||'');document.getElementById('ebtn-pf').classList.add('active');}
+    if(item.redonyPrep){
+      document.getElementById('t-redony-prep').checked=true;
+      setSelectVal('f-redony-tipus',item.redonyTipus||'');
+      setSelectVal('f-redony-vez',item.redonyVez||'');
+      setSelectVal('f-redony-lamella',item.redonyLamella||'');
+      setSelectVal('f-redony-elhelyezes',item.redonyElhelyezes||'');
+      const rSz=document.getElementById('f-redony-sz'); if(rSz) rSz.value=item.redonySz||'';
+      const rMag=document.getElementById('f-redony-mag'); if(rMag) rMag.value=item.redonyMag||'';
+      document.getElementById('ebtn-redony').classList.add('active');
+    }
+    if(item.szunyog){
+      document.getElementById('t-szunyog').checked=true;
+      setSelectVal('f-szunyog-tipus',item.szunyogTipus||'');
+      const sSz=document.getElementById('f-szunyog-sz'); if(sSz) sSz.value=item.szunyogSz||'';
+      const sM=document.getElementById('f-szunyog-m'); if(sM) sM.value=item.szunyogM||'';
+      document.getElementById('ebtn-szunyog').classList.add('active');
+    }
+    if(item.tp){
+      document.getElementById('t-tp').checked=true;
+      setSelectVal('f-tp-tipus',item.tp.tipus||'');
+      setSelectVal('f-tp-elhelyezes',item.tp.elhelyezes||'');
+      if(item.tp.tipus==='egyedi'&&item.tp.egyedi){tpEgyediData={...item.tp.egyedi};document.getElementById('tp-egyedi-sec').style.display='block';renderTpEgyediTags();}
+      else if(item.tp.display){document.getElementById('tp-sablon-display').style.display='block';document.getElementById('tp-sablon-ertek').textContent=item.tp.display||'';}
+      document.getElementById('ebtn-tp').classList.add('active');
+    }
+    if(item.oszto){document.getElementById('t-oszto').checked=true;const fO=document.getElementById('f-oszto');if(fO)fO.value=item.osztoLeiras||'';document.getElementById('ebtn-oszto').classList.add('active');}
+  }
+  if(item.tipus==='parkany'){setSelectVal('f-parkany-tipus',item.parkanyTipus||'');setSelectVal('f-parkany-szin',item.parkanySzin||'');const pSz=document.getElementById('f-parkany-sz');if(pSz)pSz.value=item.parkanySz||'';const pH=document.getElementById('f-parkany-hossz');if(pH)pH.value=item.parkanyHossz||'';}
+  if(item.tipus==='konyoklo'){setSelectVal('f-konyoklo-tipus',item.konyokloTipus||'');setSelectVal('f-konyoklo-szin',item.konyokloSzin||'');const kSz=document.getElementById('f-konyoklo-sz');if(kSz)kSz.value=item.konyokloSz||'';const kH=document.getElementById('f-konyoklo-hossz');if(kH)kH.value=item.konyokloHossz||'';}
+  const saveBtn=document.getElementById('btn-save-item');
+  if(saveBtn) saveBtn.textContent='✅ Változások mentése';
+  setTimeout(()=>document.getElementById('item-form').scrollIntoView({behavior:'smooth',block:'start'}),200);
 }
 
 function closeEditModal(){ document.getElementById('edit-modal').classList.remove('active'); editingIndex=null; }
@@ -2094,9 +2364,11 @@ function getItemFields(item){
   if(item.redonyPrep){
     f.push(['Redőny előkészítés','IGEN']);
     if(item.redonyTipus) f.push(['Redőny típus',item.redonyTipus]);
-    if(item.redonyVez) f.push(['Redőny vezérlés',item.redonyVez]);
+    if(item.redonyVez) f.push(['Működtetés',item.redonyVez]);
     if(item.redonyLamella) f.push(['Redőny lamella',item.redonyLamella]);
-    if(item.redonyElhelyezes) f.push(['Redőny elhelyezés',item.redonyElhelyezes]);
+    if(item.redonyElhelyezes) f.push(['Betáp / gurtni oldal',item.redonyElhelyezes]);
+    if(item.redonySz) f.push(['Redőny szélesség',item.redonySz+'mm']);
+    if(item.redonyMag) f.push(['Redőny magasság',item.redonyMag+'mm']);
   }
   if(item.szunyog){
     f.push(['Szúnyogháló','IGEN']);
@@ -2116,9 +2388,11 @@ function getItemFields(item){
   if(item.ajtoSzin) f.push(['Ajtó szín',item.ajtoSzin]);
   if(item.ajtoKilincs) f.push(['Kilincs',item.ajtoKilincs]);
   if(item.redonyTipus&&!item.redonyPrep) f.push(['Redőny típus',item.redonyTipus]);
-  if(item.redonyVez&&!item.redonyPrep) f.push(['Vezérlés',item.redonyVez]);
+  if(item.redonyVez&&!item.redonyPrep) f.push(['Működtetés',item.redonyVez]);
   if(item.redonyLamella&&!item.redonyPrep) f.push(['Lamella',item.redonyLamella]);
-  if(item.redonyElhelyezes&&!item.redonyPrep) f.push(['Elhelyezés',item.redonyElhelyezes]);
+  if(item.redonyElhelyezes&&!item.redonyPrep) f.push(['Betáp / gurtni oldal',item.redonyElhelyezes]);
+  if(item.redonySz&&!item.redonyPrep) f.push(['Redőny szélesség',item.redonySz+'mm']);
+  if(item.redonyMag&&!item.redonyPrep) f.push(['Redőny magasság',item.redonyMag+'mm']);
   if(item.redonyBeep) f.push(['Beépítés',item.redonyBeep]);
   if(item.roloTipus) f.push(['Roló típus',item.roloTipus]);
   if(item.roloVez) f.push(['Vezérlés',item.roloVez]);
@@ -2523,8 +2797,12 @@ const OPTION_SECTIONS=[
   {key:'takaroles_tipusok',label:'📐 Takaróléc típusok',sub:false},
   {key:'redony_tipusok',label:'🔲 Redőny típusok',sub:true},
   {key:'redony_lamellak',label:'▬ Redőny lamellák',sub:true},
-  {key:'redony_vezerlések',label:'⚙️ Redőny vezérlések',sub:false},
-  {key:'redony_elhelyezések',label:'📏 Redőny elhelyezések',sub:false},
+  {key:'redony_vezerlések',label:'⚙️ Redőny működtetés',sub:false},
+  {key:'redony_elhelyezések',label:'📏 Betáp / gurtni oldal',sub:false},
+  {key:'parkany_tipusok',label:'📏 Párkány típusok',sub:false},
+  {key:'parkany_szinek',label:'🎨 Párkány anyag/szín',sub:false},
+  {key:'konyoklo_tipusok',label:'🪨 Könyöklő típusok',sub:false},
+  {key:'konyoklo_szinek',label:'🎨 Könyöklő anyag/szín',sub:false},
   {key:'szinek',label:'🎨 Színek (ablak/ajtó)',sub:false},
   {key:'szunyoghalo_tipusok',label:'🕸️ Szúnyogháló típusok',sub:true},
   {key:'szunyoghalo_rogzitesek',label:'🔩 Szúnyogháló rögzítési módok',sub:false},
@@ -2779,7 +3057,7 @@ function closeExtraModal(type, save) {
 function clearExtraFields(type) {
   if(type==='pf') { const e=document.getElementById('f-pf-elhelyezes'); if(e) e.value=''; }
   if(type==='redony') {
-    ['f-redony-tipus','f-redony-vez','f-redony-lamella','f-redony-elhelyezes'].forEach(id=>{
+    ['f-redony-tipus','f-redony-vez','f-redony-lamella','f-redony-elhelyezes','f-redony-sz','f-redony-mag'].forEach(id=>{
       const e=document.getElementById(id); if(e) e.value='';
     });
   }
@@ -3082,7 +3360,7 @@ window.addEventListener('load',()=>{
 <div class="extra-modal-overlay" id="modal-redony">
   <div class="extra-modal">
     <div class="extra-modal-header">
-      <div class="extra-modal-title">🔲 Redőny előkészítés</div>
+      <div class="extra-modal-title">🔲 Redőny</div>
       <button class="btn-icon" onclick="closeExtraModal('redony',false)">✕</button>
     </div>
     <div class="extra-modal-body">
@@ -3096,23 +3374,20 @@ window.addEventListener('load',()=>{
           <select id="f-redony-lamella"></select>
         </div>
         <div class="form-group">
-          <label>Redőny vezérlés</label>
-          <select id="f-redony-vez">
-            <option value="">— Válasszon —</option>
-            <option>Kézi (szalagos)</option>
-            <option>Kézi (kurblis)</option>
-            <option>Motoros (230V)</option>
-            <option>Motoros (Smart)</option>
-            <option>Solar motoros</option>
-          </select>
+          <label>Működtetés</label>
+          <select id="f-redony-vez"></select>
         </div>
         <div class="form-group">
-          <label>Redőny elhelyezés</label>
-          <select id="f-redony-elhelyezes">
-            <option value="">— Válasszon —</option>
-            <option>Méreten belül (MB)</option>
-            <option>Méreten kívül (MK)</option>
-          </select>
+          <label>Betáp / gurtni oldal</label>
+          <select id="f-redony-elhelyezes"></select>
+        </div>
+        <div class="form-group">
+          <label>Redőny szélesség (mm)</label>
+          <input type="number" id="f-redony-sz" placeholder="pl. 1200">
+        </div>
+        <div class="form-group">
+          <label>Redőny magasság (mm)</label>
+          <input type="number" id="f-redony-mag" placeholder="pl. 1400">
         </div>
       </div>
     </div>
@@ -3137,12 +3412,12 @@ window.addEventListener('load',()=>{
           <select id="f-szunyog-tipus"></select>
         </div>
         <div class="form-group">
-          <label>Szélesség (mm) — ha eltér</label>
-          <input type="number" id="f-szunyog-sz" placeholder="eltérő méret">
+          <label>Szélesség (mm)</label>
+          <input type="number" id="f-szunyog-sz" placeholder="pl. 1200">
         </div>
         <div class="form-group">
-          <label>Magasság (mm) — ha eltér</label>
-          <input type="number" id="f-szunyog-m" placeholder="eltérő méret">
+          <label>Magasság (mm)</label>
+          <input type="number" id="f-szunyog-m" placeholder="pl. 1400">
         </div>
       </div>
     </div>
